@@ -39,9 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    'rest_framework_json_api',
-    'django_filters',
-    'drf_spectacular',
+    "rest_framework_json_api",
+    "django_filters",
+    "drf_spectacular",
     "app",
 ]
 
@@ -140,10 +140,10 @@ REST_FRAMEWORK = {
         "rest_framework_json_api.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-    "DEFAULT_PARSER_CLASSES": ("rest_framework_json_api.parsers.JSONParser",),
-    "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
+    "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
+    # "DEFAULT_METADATA_CLASS": "rest_framework.metadata.JSONAPIMetadata",
     "DEFAULT_FILTER_BACKENDS": (
-        'django_filters.rest_framework.DjangoFilterBackend',
+        "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework_json_api.filters.QueryParameterValidationFilter",
         "rest_framework_json_api.filters.OrderingFilter",
         # "rest_framework_json_api.filters.Filter",

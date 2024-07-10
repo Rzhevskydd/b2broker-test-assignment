@@ -1,3 +1,4 @@
+import os
 from decimal import Decimal
 
 import pytest
@@ -13,10 +14,15 @@ def setup_database():
     """Setup the test database with necessary privileges."""
     import mysql.connector
 
-    connection = mysql.connector.connect(host="db", user="root", password="mypassword")
+    connection = mysql.connector.connect(
+        host=os.getenv("MYSQL_HOST", "localhost"),
+        user=os.getenv("MYSQL_USER", "myuser"),
+        password="mypassword",
+    )
     cursor = connection.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS test_mydatabase;")
-    cursor.execute("GRANT ALL PRIVILEGES ON test_mydatabase.* TO 'myuser'@'%';")
+    cursor.execute(
+        f"GRANT ALL PRIVILEGES ON test_mydatabase.* TO '{os.getenv('MYSQL_USER', 'myuser')}'@'%';"
+    )
     cursor.execute("FLUSH PRIVILEGES;")
     cursor.close()
     connection.close()
@@ -24,7 +30,10 @@ def setup_database():
 
 @pytest.fixture
 def api_client():
-    return APIClient()
+    client = APIClient()
+    client.default_format = "json"
+    client.credentials(HTTP_CONTENT_TYPE="application/json")
+    return client
 
 
 @pytest.fixture(autouse=True)
@@ -39,28 +48,38 @@ def clean_database():
 
 @pytest.mark.django_db
 def test_wallet_creation(api_client):
-    response = api_client.post(reverse("wallet-list"), {"label": "Test Wallet"})
+    # headers = {
+    #     "Content-Type": "application/json"
+    # }
+    response = api_client.post(
+        "/api/wallets/",
+        {"label": "Test Wallet"},
+        format="json",
+    )
     assert response.status_code == 201
     assert Wallet.objects.count() == 1
 
 
 @pytest.mark.django_db
 def test_transaction_creation(api_client):
-    wallet = Wallet.objects.create(label="Test Wallet")
+    wallet = Wallet.objects.create(label="Test Wallet", balance=Decimal("0.00"))
     response = api_client.post(
-        reverse("transaction-list"),
-        {"wallet_id": wallet.id, "txid": "12345", "amount": "100.00"},
+        "/api/transactions/",
+        {"wallet": wallet.id, "txid": "12345", "amount": "100.00"},
+        format="json",
     )
+
     assert response.status_code == 201
     assert Transaction.objects.count() == 1
 
 
 @pytest.mark.django_db
 def test_wallet_balance_update(api_client):
-    wallet = Wallet.objects.create(label="Test Wallet")
+    wallet = Wallet.objects.create(label="Test Wallet", balance=Decimal("0.00"))
     api_client.post(
         reverse("transaction-list"),
-        {"wallet_id": wallet.id, "txid": "12345", "amount": "100.00"},
+        {"wallet": wallet.id, "txid": "12345", "amount": "100.00"},
+        format="json",
     )
     wallet.refresh_from_db()
     assert wallet.balance == Decimal("100.00")
@@ -74,11 +93,13 @@ def test_get_wallets(api_client):
 
     response = api_client.get(reverse("wallet-list"))
     assert response.status_code == 200
-    assert len(response.data) == 3
+    assert len(response.data["results"]) == 3
 
-    response = api_client.get(reverse("wallet-list") + "?label=Wallet 1")
+    url = "/api/wallets/"
+    response = api_client.get(url, {"label": "wallet"})
+
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
     assert response.data[0]["label"] == "Wallet 1"
 
 
@@ -90,14 +111,15 @@ def test_get_transactions(api_client):
     Transaction.objects.create(wallet=wallet, txid="tx3", amount=Decimal("300.00"))
 
     response = api_client.get(reverse("transaction-list"))
+    print(response.content)
     assert response.status_code == 200
-    assert len(response.data) == 3
+    assert len(response.data["results"]) == 3
 
     response = api_client.get(reverse("transaction-list") + "?txid=tx1")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
     assert response.data[0]["txid"] == "tx1"
 
     response = api_client.get(reverse("transaction-list") + f"?wallet_id={wallet.id}")
     assert response.status_code == 200
-    assert len(response.data) == 3
+    assert len(response.data["results"]) == 3
