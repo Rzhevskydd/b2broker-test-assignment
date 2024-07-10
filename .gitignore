@@ -1,0 +1,69 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Poetry
+poetry.lock
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+*.pdb
+*.mo
+*.DS_Store
+*.env
+
+*.env
+
+# If your build process includes static assets:
+staticfiles/
+static/
+node_modules/
+
+# If you use mypy for type checking:
+.mypy_cache/
+.dmypy.json
+
+# If you use coverage for code coverage:
+htmlcov/
+
+# If you use pytest for testing:
+pytest_cache/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+
+# If you use Jupyter notebooks:
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
