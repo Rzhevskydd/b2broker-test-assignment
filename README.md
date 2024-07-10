@@ -21,7 +21,7 @@ This project is a Django REST API for managing wallets and transactions, using J
 
 ### Setup and Installation
 
-1. **Clone the repository:**
+**Clone the repository:**
 
    ```sh
    git clone <your-repo-url>
@@ -33,6 +33,7 @@ This project is a Django REST API for managing wallets and transactions, using J
 
 ```sh
 poetry install
+
 Create a .env file:
 MYSQL_DATABASE=mydatabase
 MYSQL_USER=myuser
