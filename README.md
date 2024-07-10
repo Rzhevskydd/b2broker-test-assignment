@@ -32,7 +32,6 @@ This project is a Django REST API for managing wallets and transactions, using J
 **Install dependencies:**
 
 ```sh
-Копировать код
 poetry install
 Create a .env file:
 MYSQL_DATABASE=mydatabase
@@ -63,5 +62,6 @@ Redoc: http://localhost:8000/api/schema/redoc/
 
 **Running Tests**
 
-```docker-compose run test
+```
+docker-compose run test
 ```
